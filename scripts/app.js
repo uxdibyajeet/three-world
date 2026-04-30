@@ -5,11 +5,28 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+// Ortographic Camera
+function createCamera (zoom = 5) {
+    const aspectRatio = window.innerWidth / window.innerHeight;
+    const camera = new THREE.OrthographicCamera(
+        -zoom * aspectRatio, //left
+        zoom * aspectRatio, //right
+        zoom, //top
+        -zoom, //bottom
+        0.1, //near
+        1000 //far
+    );
+    camera.position.set(zoom, zoom, zoom);
+    camera.lookAt(0, 0 , 0);
+
+    return camera;
+}
+
+const zoomLevel = 5;
+let mainCamera = createCamera(zoomLevel);
+
 // Scene, Camera and Renderer
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.z = 5;
-
 const renderer = new THREE.WebGLRenderer({ antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -17,8 +34,7 @@ const app = document.querySelector('.app');
 app.appendChild(renderer.domElement);
 
 //Controls and Loaders
-
-const controls = new OrbitControls( camera, renderer.domElement );
+const controls = new OrbitControls( mainCamera, renderer.domElement );
 const loader = new GLTFLoader();
 
 //add cube
@@ -29,6 +45,6 @@ scene.add(cube);
 
 function animate( time ) {
     controls.update();
-    renderer.render( scene, camera );
+    renderer.render( scene, mainCamera );
 }
 renderer.setAnimationLoop( animate );
